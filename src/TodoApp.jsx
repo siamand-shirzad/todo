@@ -68,22 +68,7 @@ const formatDate = timestamp => {
   });
 };
 
-const getPriorityColor = priority => {
-  switch (priority) {
-    case 'high':
-      return 'bg-red-500 hover:bg-red-600';
-    case 'medium':
-      return 'bg-yellow-500 hover:bg-yellow-600';
-    case 'low':
-      return 'bg-green-500 hover:bg-green-600';
-    default:
-      return 'bg-gray-500 hover:bg-gray-600';
-  }
-};
 
-// ----------------------------------------------------------------------------------
-// Main Component
-// ----------------------------------------------------------------------------------
 
 export default function ProTodoApp() {
   const [activeTab, setActiveTab] = useState('all');
@@ -162,8 +147,7 @@ export default function ProTodoApp() {
                       <Badge variant="outline" className="px-2 py-0.5 text-muted-foreground">
                         {todo.category}
                       </Badge>
-                      {/* 3.1.2. Priority (تابع کمکی رنگ را می‌گیرد) */}
-                      <Badge className={`px-2 py-0.5 text-white ${getPriorityColor(todo.priority)}`}>
+                      <Badge priority={todo.priority} >
                         {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
                       </Badge>
                       {/* 3.1.3. Created At */}

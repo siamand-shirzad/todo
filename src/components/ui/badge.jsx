@@ -16,9 +16,10 @@ const badgeVariants = cva(
         outline: 'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground'
       },
       priority: {
-        high: 'border border-red-300 text-red-600 bg-red-50 hover:bg-red-100',
-        medium: 'border border-yellow-300 text-yellow-700 bg-yellow-50 hover:bg-yellow-100',
-        low: 'border-none text-green-700 bg-green-100 hover:bg-green-100'
+        high: 'bg-red-600/10 dark:bg-red-600/20 hover:bg-red-600/10 text-red-500 border-red-600/60 shadow-none rounded-full',
+        medium:
+          'bg-yellow-600/10 dark:bg-yellow-600/20 hover:bg-yellow-600/10 text-yellow-500 border-yellow-600/60 shadow-none rounded-full',
+        low: 'bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full'
       }
     },
     defaultVariants: {
@@ -27,10 +28,10 @@ const badgeVariants = cva(
   }
 );
 
-function Badge({ className, variant, asChild = false, ...props }) {
+function Badge({ className, variant, priority, asChild = false, ...props }) {
   const Comp = asChild ? Slot : 'span';
 
-  return <Comp data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props} />;
+  return <Comp data-slot="badge" className={cn(badgeVariants({ variant, priority }), className)} {...props} />;
 }
 
 export { Badge, badgeVariants };

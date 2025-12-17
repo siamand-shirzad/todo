@@ -12,39 +12,26 @@ const useTodoStore = create(
       filterStatus: 'all', 
 
       // ------------------------------------------------
-      // 2. اکشن‌ها (Actions)
+      // 2. (Actions)
       // ------------------------------------------------
 
-      // افزودن تسک جدید با عنوان
-      addTodo: (newTodo) => {
-        // const newTodo = {
-        //   id: Date.now(),             
-        //   title: title,               // فیلد جدید عنوان
-        //   completed: false,           
-        //   category: category,         
-        //   priority: priority,         
-        //   createdAt: Date.now(),      
-        // };
+      addTask: (newTodo) => {
 
         set((state) => ({
           todos: [newTodo, ...state.todos],
         }));
       },
-
-      deleteTodo: (id) => {
+      deleteTask: (id) => {
         set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) }));
       },
-
-      toggleTodo: (id) => {
+      toggleTask: (id) => {
         set((state) => ({
           todos: state.todos.map((todo) =>
             todo.id === id ? { ...todo, completed: !todo.completed } : todo
           ),
         }));
       },
-
-      // ویرایش عنوان، دسته‌بندی و اولویت
-      updateTodo: (id, newTitle, newCategory, newPriority) => {
+      updateTask: (id, newTitle, newCategory, newPriority) => {
         set((state) => ({
           todos: state.todos.map((todo) =>
             todo.id === id 
@@ -64,7 +51,7 @@ const useTodoStore = create(
     }),
 
     // ------------------------------------------------
-    // 3. تنظیمات Persist
+    // 3.  Persist settings
     // ------------------------------------------------
     {
       name: 'todo-storage', 

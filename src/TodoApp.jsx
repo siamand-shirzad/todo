@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger
 } from './components/ui/dropdown-menu';
 import useTodoStore from './store/useTodoStore';
+import DeleteTaskDialog from './components/DeleteTaskDialog';
 
 const staticTodos = [
   {
@@ -68,13 +69,14 @@ const formatDate = timestamp => {
   });
 };
 
-
-
 export default function ProTodoApp() {
   const [activeTab, setActiveTab] = useState('all');
-  // In a real project, these would come from the Zustand Store
-  // const todos = staticTodos;
+
   const todos = useTodoStore(state => state.todos);
+  const deleteTask = useTodoStore(state => state.deleteTask);
+  const toggleTask = useTodoStore(state => state.toggleTask);
+  const updateTask = useTodoStore(state => state.updateTask);
+  const clearCompleted = useTodoStore(state => state.clearCompleted);
   // Filters should be applied here
   // const filteredTodos = useMemo(() => { ... });
 
@@ -93,9 +95,8 @@ export default function ProTodoApp() {
           {/* * تغییرات: text-blue-600 به text-primary تبدیل شد */}
           <CardTitle className="flex items-center text-3xl font-extrabold text-primary">
             <Zap className="h-6 w-6 mr-2" />
-            Pro Task Manager
+            Task Manager
           </CardTitle>
-          {/* * تغییرات: CardDescription از text-muted-foreground استفاده می‌کند */}
           <CardDescription className="text-muted-foreground">
             Sample React/Tailwind portfolio project with data persistence (Zustand Persist)
           </CardDescription>
@@ -114,7 +115,6 @@ export default function ProTodoApp() {
           {/* 2. Filter & Search Section (بدون تغییر مهم) */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative grow">
-              {/* * تغییرات: text-gray-400 به text-muted-foreground تبدیل شد */}
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search by title..." className="pl-8" />
             </div>
@@ -133,9 +133,9 @@ export default function ProTodoApp() {
               <div
                 key={todo.id}
                 className="flex justify-center-safe  p-3 border rounded-lg border-border bg-transparent hover:bg-accent/50 transition duration-150">
-                {/* 3.1. Main Content */}
+                {/*  Main Content */}
                 <div className="flex  space-x-3 grow">
-                  <Checkbox checked={todo.completed} className="mt-1 shrink-0" />
+                  <Checkbox onClick={() => toggleTask(todo.id)} checked={todo.completed} className="mt-1 shrink-0" />
                   <div className="flex flex-col">
                     <span
                       className={`text-lg font-medium ${
@@ -147,15 +147,15 @@ export default function ProTodoApp() {
                       <Badge variant="outline" className="px-2 py-0.5 text-muted-foreground">
                         {todo.category}
                       </Badge>
-                      <Badge priority={todo.priority} >
+                      <Badge priority={todo.priority}>
                         {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
                       </Badge>
-                      {/* 3.1.3. Created At */}
+                      {/*  Created At */}
                       <span className="flex items-center">
                         <Clock className="h-3 w-3 ml-1 mr-1" />
                         {formatDate(todo.createdAt)}
                       </span>
-                      {/* 3.1.4. Due Date (به جای رنگ ثابت blue-500 از primary استفاده می‌کنیم) */}
+                      {/*  Due Date  */}
                       {todo.dueDate && (
                         <span className="flex items-center text-primary font-semibold">
                           <Calendar className="h-3 w-3 ml-2 mr-1" />
@@ -168,24 +168,22 @@ export default function ProTodoApp() {
 
                 {/*  Actions (Edit & Delete) */}
                 <div className="flex space-x-2 shrink-0">
-                  {/* Edit Button: از text-muted-foreground استفاده می‌کند */}
                   <Button
                     variant="ghost"
                     size="icon"
                     className=" text-muted-foreground hover:text-secondary hover:bg-secondary/10 dark:hover:bg-secondary/10 "
-                    aria-label="Edit Task" // A11y Improvement
-                  >
+                    aria-label="Edit Task">
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  {/* Delete Button: از رنگ‌های معناگرای destructive استفاده می‌کند */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/10 "
-                    aria-label="Delete Task" // A11y Improvement
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <DeleteTaskDialog onConfirm={() => deleteTask(todo.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/10 "
+                      aria-label="Delete Task">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </DeleteTaskDialog>
                   <div className="flex space-x-2 shrink-0">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -219,9 +217,12 @@ export default function ProTodoApp() {
           </div>
           {/* 4. Footer Actions (Clear Completed) */}
           <div className="mt-6 flex justify-end">
-            <Button variant="outline" className="text-destructive hover:bg-destructive/10">
+            <DeleteTaskDialog title='Clear all completed tasks?' onConfirm={clearCompleted} >
+
+            <Button  variant="outline" className="text-destructive hover:bg-destructive/10">
               Clear Completed
             </Button>
+            </DeleteTaskDialog>
           </div>
         </CardContent>
       </Card>

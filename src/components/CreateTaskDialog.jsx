@@ -33,22 +33,20 @@ const categories = [
 ];
 
 export function CreateTaskDialog() {
-  const addTodo = useTodoStore((state) => state.addTodo);
-
+  const addTask = useTodoStore((state) => state.addTask);
   const [open, setOpen] = React.useState(false);
-  // حالت‌های محلی برای نگهداری مقادیر فرم
+
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [priority, setPriority] = React.useState(priorities[0]); // Low as default
   const [category, setCategory] = React.useState(categories[0]); // Work as default
   const [dueDate, setDueDate] = React.useState(null); // Calendar state needed here
 
-  // تابع هندل کردن ارسال فرم
   const handleSave = () => {
     if (!title.trim()) return; // Title is required
 
     const newTask = {
-      id: Date.now(), // یا از یک کتابخانه UUID استفاده شود
+      id: Date.now(),
       title,
       description,
       priority: priority.value,
@@ -58,14 +56,12 @@ export function CreateTaskDialog() {
       createdAt: Date.now()
     };
     console.log(newTask);
-    addTodo(newTask)
-    // onAddTask(newTask); // فراخوانی تابع افزودن از کامپوننت والد (Task Manager)
+    addTask(newTask)
 
-    // ریست کردن فرم
     setTitle('');
     setDescription('');
     setDueDate(null);
-    setOpen(false); // بستن دیالوگ
+    setOpen(false); 
   };
 
   return (

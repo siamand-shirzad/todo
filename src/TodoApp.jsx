@@ -6,9 +6,29 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Trash2, Calendar, Clock, Loader2, Zap, Pencil, MoreHorizontal } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  Trash2,
+  Calendar,
+  Clock,
+  Loader2,
+  Zap,
+  Pencil,
+  MoreHorizontal,
+  MoreHorizontalIcon
+} from 'lucide-react';
 import DarkmodeButton from './components/DarkmodeButton';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from './components/ui/dropdown-menu';
+import useTodoStore from './store/useTodoStore';
 
 const staticTodos = [
   {
@@ -68,8 +88,8 @@ const getPriorityColor = priority => {
 export default function ProTodoApp() {
   const [activeTab, setActiveTab] = useState('all');
   // In a real project, these would come from the Zustand Store
-  const todos = staticTodos;
-
+  // const todos = staticTodos;
+  const todos = useTodoStore(state => state.todos);
   // Filters should be applied here
   // const filteredTodos = useMemo(() => { ... });
 
@@ -94,32 +114,26 @@ export default function ProTodoApp() {
           <CardDescription className="text-muted-foreground">
             Sample React/Tailwind portfolio project with data persistence (Zustand Persist)
           </CardDescription>
-          <DarkmodeButton/>
+          <DarkmodeButton />
         </CardHeader>
         <CardContent>
           {/* 1. Add New Task Section */}
           <div className="flex space-x-2 mb-6">
             <Input
               placeholder="New task title..."
-              className="flex-grow"
+              className="grow"
               // ...
             />
-            {/* * تغییرات: bg-blue-600 به bg-primary و hover:bg-blue-700 به hover:bg-primary/90 تبدیل شد */}
-            <Button className=" bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="h-4 w-4 " />
-              New Task
-            </Button>
-            <CreateTaskDialog/>
+            <CreateTaskDialog />
           </div>
-
           {/* 2. Filter & Search Section (بدون تغییر مهم) */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-grow">
+            <div className="relative grow">
               {/* * تغییرات: text-gray-400 به text-muted-foreground تبدیل شد */}
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search by title..." className="pl-8" />
             </div>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto flex-shrink-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto ">
               {/* TabsList و TabsTrigger نیازی به تغییر دستی رنگ ندارند */}
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="all">All</TabsTrigger>
@@ -128,7 +142,6 @@ export default function ProTodoApp() {
               </TabsList>
             </Tabs>
           </div>
-
           {/* 3. Task List */}
           <div className="space-y-3">
             {todos.map(todo => (
@@ -136,7 +149,7 @@ export default function ProTodoApp() {
                 key={todo.id}
                 className="flex justify-center-safe  p-3 border rounded-lg border-border bg-transparent hover:bg-accent/50 transition duration-150">
                 {/* 3.1. Main Content */}
-                <div className="flex  space-x-3 flex-grow">
+                <div className="flex  space-x-3 grow">
                   <Checkbox checked={todo.completed} className="mt-1 shrink-0" />
                   <div className="flex flex-col">
                     <span
@@ -189,20 +202,39 @@ export default function ProTodoApp() {
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className=" text-muted-foreground hover:text-primary hover:bg-popover">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  <div className="flex space-x-2 shrink-0">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className=" text-muted-foreground hover:text-primary hover:bg-popover"
+                          aria-label="More actions">
+                          <MoreHorizontalIcon className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem className="text-muted-foreground hover:text-foreground cursor-pointer">
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit Task
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem className="text-destructive cursor-pointer">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Task
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-
           {/* 4. Footer Actions (Clear Completed) */}
           <div className="mt-6 flex justify-end">
-            {/* * تغییرات: text-red-500 و hover:bg-red-50 به text-destructive تبدیل شد */}
             <Button variant="outline" className="text-destructive hover:bg-destructive/10">
               Clear Completed
             </Button>

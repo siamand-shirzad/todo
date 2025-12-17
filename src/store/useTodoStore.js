@@ -16,22 +16,21 @@ const useTodoStore = create(
       // ------------------------------------------------
 
       // افزودن تسک جدید با عنوان
-      addTodo: (title, category = 'عمومی', priority = 'medium') => {
-        const newTodo = {
-          id: Date.now(),             
-          title: title,               // فیلد جدید عنوان
-          completed: false,           
-          category: category,         
-          priority: priority,         
-          createdAt: Date.now(),      
-        };
+      addTodo: (newTodo) => {
+        // const newTodo = {
+        //   id: Date.now(),             
+        //   title: title,               // فیلد جدید عنوان
+        //   completed: false,           
+        //   category: category,         
+        //   priority: priority,         
+        //   createdAt: Date.now(),      
+        // };
 
         set((state) => ({
           todos: [newTodo, ...state.todos],
         }));
       },
 
-      // حذف، تغییر وضعیت (Toggle) و پاک کردن تکمیل شده‌ها (همانند قبل، فقط از title استفاده می‌شود)
       deleteTodo: (id) => {
         set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) }));
       },
@@ -68,8 +67,8 @@ const useTodoStore = create(
     // 3. تنظیمات Persist
     // ------------------------------------------------
     {
-      name: 'pro-todo-storage', 
-      storage: createJSONStorage(() => localStorage),
+      name: 'todo-storage', 
+      // storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ todos: state.todos }),
       version: 1,
     }

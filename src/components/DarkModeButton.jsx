@@ -1,17 +1,30 @@
 import { useThemeStore } from '@/store/useThemeStore';
-import { VscColorMode } from 'react-icons/vsc';
+import { FiMoon, FiSun } from 'react-icons/fi';
 
-const DarkmodeButton = () => {
+const DarkmodeButton = ({ className }) => {
   const toggleMode = useThemeStore(state => state.toggleMode);
   const isDarkMode = useThemeStore(state => state.isDarkMode);
+
   return (
-    <div>
-      <button
-        onClick={toggleMode}
-        className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded">
-       <VscColorMode />
-      </button>
-    </div>
+    <button
+      onClick={toggleMode}
+      className={`
+        inline-flex items-center justify-center gap-2 whitespace-nowrap 
+        rounded-lg text-sm font-medium transition-all 
+        disabled:pointer-events-none disabled:opacity-50
+        outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]
+        border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground
+        dark:bg-input/30 dark:border-input dark:hover:bg-input/50
+        w-10 h-10 ${className || ''}
+      `}
+      aria-label="Toggle Dark Mode"
+    >
+      {isDarkMode ? (
+        <FiSun className="size-4.5 " />
+      ) : (
+        <FiMoon className="size-4.5 " />
+      )}
+    </button>
   );
 };
 

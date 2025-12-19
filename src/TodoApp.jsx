@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// Assuming shadcn/ui components are correctly imported
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,9 @@ import {
   Pencil,
   MoreHorizontal,
   MoreHorizontalIcon,
-  X
+  X,
+  ChevronRight,
+  CalendarDays
 } from 'lucide-react';
 import DarkmodeButton from './components/DarkmodeButton';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
@@ -31,7 +32,8 @@ import {
 } from './components/ui/dropdown-menu';
 import useTodoStore from './store/useTodoStore';
 import DeleteTaskDialog from './components/DeleteTaskDialog';
-
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown } from 'lucide-react';
 const staticTodos = [
   {
     id: 1702554000001,
@@ -113,22 +115,19 @@ export default function ProTodoApp() {
             Task Manager
             <DarkmodeButton className="ml-auto " />
           </CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Sample React/Tailwind portfolio project with data persistence (Zustand Persist)
-          </CardDescription>
+          <div className="flex flex-col md:flex-row md:items-center gap-2 mt-2 text-muted-foreground">
+            <CardDescription className="text-sm">
+              <span className="hidden md:block w-1 h-1 bg-muted-foreground/30 rounded-full"></span>
+              <div className="flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full w-fit">
+                <CalendarDays size={12} />
+                <span>جمعه، ۲۹ آذر</span>
+              </div>
+            </CardDescription>
+          </div>{' '}
         </CardHeader>
         <CardContent>
           {/* 1. Add New Task Section */}
           <div className="flex space-x-2 mb-6">
-            <Input
-              placeholder="New task title..."
-              className="grow"
-              // ...
-            />
-            <CreateTaskDialog />
-          </div>
-          {/* 2. Filter & Search Section (بدون تغییر مهم) */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative grow">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
@@ -145,103 +144,106 @@ export default function ProTodoApp() {
                 </button>
               )}
             </div>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto ">
-              {/* TabsList و TabsTrigger نیازی به تغییر دستی رنگ ندارند */}
-              <TabsList className="grid w-full grid-cols-3">
+
+            <CreateTaskDialog />
+          </div>
+          <div className="flex items-center justify-between mb-3">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid gap-2 grid-cols-3">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="active">Active</TabsTrigger>
                 <TabsTrigger value="completed">Done</TabsTrigger>
               </TabsList>
             </Tabs>
+
+            <div className="flex mr-2  ">
+              <span className="text-sm text-muted-foreground">
+                {activeTab === 'all' && `${filteredTodos.length} total tasks`}
+                {activeTab === 'active' && `${filteredTodos.length} active tasks`}
+                {activeTab === 'completed' && `${filteredTodos.length} completed tasks`}
+              </span>
+            </div>
           </div>
           {/* 3. Task List */}
           <div className="space-y-3">
             {filteredTodos.map(todo => (
-              <div
+              <Collapsible
                 key={todo.id}
-                className="flex justify-center items-center  p-3 border rounded-lg border-border bg-transparent hover:bg-accent/50 transition duration-150">
-                {/*  Main Content */}
-                <div className="flex  space-x-3 grow">
-                  <Checkbox onClick={() => toggleTask(todo.id)} checked={todo.completed} className="my-auto shrink-0" />
-                  <div className="flex ">
+                className="w-full border rounded-lg border-border bg-transparent hover:bg-accent/30 transition-all duration-200 group">
+                {/* ردیف اصلی که همیشه نمایش داده می‌شود */}
+                <div className="flex items-center p-3 gap-3">
+                  <Checkbox
+                    onClick={e => {
+                      e.stopPropagation(); // جلوگیری از باز شدن ناخواسته Collapsible
+                      toggleTask(todo.id);
+                    }}
+                    checked={todo.completed}
+                    className="shrink-0"
+                  />
+
+                  <div className="grow min-w-0">
                     <span
-                      className={`text-lg font-normal ${
+                      className={`text-base font-medium truncate block ${
                         todo.completed ? 'line-through text-muted-foreground' : 'text-foreground'
                       }`}>
                       {todo.title}
                     </span>
-                    <div className="flex items-center space-x-3 text-xs text-muted-foreground mt-1">
-                      <Badge variant="outline" className="px-2 py-0.5 text-muted-foreground">
-                        {todo.category}
-                      </Badge>
-                      <Badge priority={todo.priority}>
-                        {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
-                      </Badge>
-                      {/*  Created At */}
-                      <span className="flex items-center">
-                        <Clock className="h-3 w-3 ml-1 mr-1" />
-                        {formatDate(todo.createdAt)}
-                      </span>
-                      {/*  Due Date  */}
-                      {todo.dueDate && (
-                        <span className="flex items-center text-primary font-semibold">
-                          <Calendar className="h-3 w-3 ml-2 mr-1" />
-                          Due: {formatDate(new Date(todo.dueDate).getTime())}
-                        </span>
-                      )}
-                    </div>
                   </div>
-                </div>
 
-                {/*  Actions (Edit & Delete) */}
-                <div className="flex space-x-2 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className=" text-muted-foreground hover:text-secondary hover:bg-secondary/10 dark:hover:bg-secondary/10 "
-                    aria-label="Edit Task">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <DeleteTaskDialog onConfirm={() => deleteTask(todo.id)}>
+                  {/* بخش دکمه‌های عملیاتی */}
+                  <div className="flex items-center space-x-1 md:space-x-2  shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/10 "
-                      aria-label="Delete Task">
-                      <Trash2 className="h-4 w-4" />
+                      className=" text-muted-foreground hover:text-secondary hover:bg-secondary/10 dark:hover:bg-secondary/10 h-8 w-8"
+                      aria-label="Edit Task">
+                      <Pencil className="h-4 w-4" />
                     </Button>
-                  </DeleteTaskDialog>
-                  <div className="flex space-x-2 shrink-0">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className=" text-muted-foreground hover:text-primary hover:bg-popover"
-                          aria-label="More actions">
-                          <MoreHorizontalIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
+                    <DeleteTaskDialog onConfirm={() => deleteTask(todo.id)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/10 h-8 w-8 "
+                        aria-label="Delete Task">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </DeleteTaskDialog>
 
-                        <DropdownMenuItem className="text-muted-foreground hover:text-foreground cursor-pointer">
-                          <Pencil className="h-4 w-4 mr-2" />
-                          Edit Task
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem className="text-destructive cursor-pointer">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Task
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                      </Button>
+                    </CollapsibleTrigger>
                   </div>
                 </div>
-              </div>
+
+                {/* محتوای مخفی که با زدن فلش باز می‌شود */}
+                <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                  <div className="px-3 pb-4 pt-1 flex flex-wrap items-center gap-3 border-t border-border/40 mx-3 mt-1">
+                    <Badge variant="outline" className="px-2 py-0.5 text-muted-foreground">
+                      {todo.category}
+                    </Badge>
+
+                    <Badge priority={todo.priority}>
+                      {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+                    </Badge>
+
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {formatDate(todo.createdAt)}
+                    </div>
+
+                    {todo.dueDate && (
+                      <div className="flex items-center text-xs text-primary font-semibold">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        Due: {formatDate(new Date(todo.dueDate).getTime())}
+                      </div>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             ))}
-          </div>
+          </div>{' '}
           {/* 4. Footer Actions (Clear Completed) */}
           <div className="mt-6 flex justify-end">
             <DeleteTaskDialog title="Clear all completed tasks?" onConfirm={clearCompleted}>

@@ -16,7 +16,8 @@ import {
   Zap,
   Pencil,
   MoreHorizontal,
-  MoreHorizontalIcon
+  MoreHorizontalIcon,
+  X
 } from 'lucide-react';
 import DarkmodeButton from './components/DarkmodeButton';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
@@ -71,6 +72,7 @@ const formatDate = timestamp => {
 
 export default function ProTodoApp() {
   const [activeTab, setActiveTab] = useState('all');
+  const [searchChar, setSearchChar] = useState('');
 
   const todos = useTodoStore(state => state.todos);
   const deleteTask = useTodoStore(state => state.deleteTask);
@@ -86,21 +88,34 @@ export default function ProTodoApp() {
   // ----------------------------------------------------------------------------------
   // کامپوننت اصلی بازنویسی شده
   // ----------------------------------------------------------------------------------
+  const filteredTodos = todos.filter(todo => {
+    // فیلتر تب فعال
+    const tabFilter =
+      activeTab === 'all' ||
+      (activeTab === 'active' && !todo.completed) ||
+      (activeTab === 'completed' && todo.completed);
+
+    // فیلتر جستجو
+    console.log(searchChar);
+
+    const searchFilter = todo.title.toLowerCase().includes(searchChar.toLowerCase());
+
+    // فقط وقتی هر دو درست باشه، عنصر نگه داشته میشه
+    return tabFilter && searchFilter;
+  });
 
   return (
     <div className="container mx-auto p-4  bg-background max-w-3xl ">
-      {/* * تغییرات: از shadow-2xl به shadow-lg و bg-card برای تم‌دهی استفاده شد */}
       <Card className="shadow-lg bg-card">
         <CardHeader>
-          {/* * تغییرات: text-blue-600 به text-primary تبدیل شد */}
           <CardTitle className="flex items-center text-3xl font-extrabold text-primary">
             <Zap className="h-6 w-6 mr-2" />
             Task Manager
+            <DarkmodeButton className="ml-auto " />
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             Sample React/Tailwind portfolio project with data persistence (Zustand Persist)
           </CardDescription>
-          <DarkmodeButton />
         </CardHeader>
         <CardContent>
           {/* 1. Add New Task Section */}
@@ -115,8 +130,20 @@ export default function ProTodoApp() {
           {/* 2. Filter & Search Section (بدون تغییر مهم) */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative grow">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by title..." className="pl-8" />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                value={searchChar}
+                onChange={e => setSearchChar(e.target.value)}
+                placeholder="Search by title..."
+                className="pl-10"
+              />
+              {searchChar && (
+                <button
+                  onClick={() => setSearchChar('')}
+                  className="absolute right-2 top-1/2 transform  -translate-y-1/2">
+                  <X className="text-muted-foreground hover:text-foreground w-5 h-5 transition-colors duration-150" />
+                </button>
+              )}
             </div>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto ">
               {/* TabsList و TabsTrigger نیازی به تغییر دستی رنگ ندارند */}
@@ -129,16 +156,16 @@ export default function ProTodoApp() {
           </div>
           {/* 3. Task List */}
           <div className="space-y-3">
-            {todos.map(todo => (
+            {filteredTodos.map(todo => (
               <div
                 key={todo.id}
-                className="flex justify-center-safe  p-3 border rounded-lg border-border bg-transparent hover:bg-accent/50 transition duration-150">
+                className="flex justify-center items-center  p-3 border rounded-lg border-border bg-transparent hover:bg-accent/50 transition duration-150">
                 {/*  Main Content */}
                 <div className="flex  space-x-3 grow">
-                  <Checkbox onClick={() => toggleTask(todo.id)} checked={todo.completed} className="mt-1 shrink-0" />
-                  <div className="flex flex-col">
+                  <Checkbox onClick={() => toggleTask(todo.id)} checked={todo.completed} className="my-auto shrink-0" />
+                  <div className="flex ">
                     <span
-                      className={`text-lg font-medium ${
+                      className={`text-lg font-normal ${
                         todo.completed ? 'line-through text-muted-foreground' : 'text-foreground'
                       }`}>
                       {todo.title}
@@ -217,11 +244,10 @@ export default function ProTodoApp() {
           </div>
           {/* 4. Footer Actions (Clear Completed) */}
           <div className="mt-6 flex justify-end">
-            <DeleteTaskDialog title='Clear all completed tasks?' onConfirm={clearCompleted} >
-
-            <Button  variant="outline" className="text-destructive hover:bg-destructive/10">
-              Clear Completed
-            </Button>
+            <DeleteTaskDialog title="Clear all completed tasks?" onConfirm={clearCompleted}>
+              <Button variant="outline" className="text-destructive hover:bg-destructive/10">
+                Clear Completed
+              </Button>
             </DeleteTaskDialog>
           </div>
         </CardContent>

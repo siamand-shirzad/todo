@@ -18,7 +18,8 @@ import {
   MoreHorizontalIcon,
   X,
   ChevronRight,
-  CalendarDays
+  CalendarDays,
+  ListFilterIcon
 } from 'lucide-react';
 import DarkmodeButton from './components/DarkmodeButton';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
@@ -33,7 +34,10 @@ import {
 import useTodoStore from './store/useTodoStore';
 import DeleteTaskDialog from './components/DeleteTaskDialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
+import { GoTrash } from 'react-icons/go';
+import { FiTrash2 } from 'react-icons/fi';
+import { TaskItem } from './components/TaskItems';
+import { TaskItem1 } from './components/TaskItems1';
 const staticTodos = [
   {
     id: 1702554000001,
@@ -164,84 +168,106 @@ export default function ProTodoApp() {
               </span>
             </div>
           </div>
+          {/* 2. Filter Section */}
+          {/* <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/40 rounded-full border border-border/20 text-[11px] font-bold text-muted-foreground uppercase tracking-tight shrink-0">
+              <ListFilterIcon className="w-3 h-3" />
+              Filters:
+            </div>
+
+            نمونه یک فیلتر فعال
+            <button className="px-3 py-1.5 rounded-full bg-primary/5 border border-primary/20 text-xs font-medium text-primary hover:bg-primary/10 transition-colors whitespace-nowrap">
+              High Priority
+            </button>
+
+            نمونه یک فیلتر غیرفعال
+            <button className="px-3 py-1.5 rounded-full bg-muted/30 border border-transparent text-xs font-medium text-muted-foreground hover:border-border/50 transition-colors whitespace-nowrap">
+              Design
+            </button>
+
+            <button className="px-3 py-1.5 rounded-full bg-muted/30 border border-transparent text-xs font-medium text-muted-foreground hover:border-border/50 transition-colors whitespace-nowrap">
+              Dev
+            </button>
+          </div> */}
           {/* 3. Task List */}
           <div className="space-y-3">
             {filteredTodos.map(todo => (
-              <Collapsible
-                key={todo.id}
-                className="w-full border rounded-lg border-border bg-transparent hover:bg-accent/30 transition-all duration-200 group">
-                {/* ردیف اصلی که همیشه نمایش داده می‌شود */}
-                <div className="flex items-center p-3 gap-3">
-                  <Checkbox
-                    onClick={e => {
-                      e.stopPropagation(); // جلوگیری از باز شدن ناخواسته Collapsible
-                      toggleTask(todo.id);
-                    }}
-                    checked={todo.completed}
-                    className="shrink-0"
-                  />
+              <TaskItem key={todo.id} todo={todo} toggleTask={toggleTask} deleteTask={deleteTask} />
+              // <Collapsible
+              //   key={todo.id}
+              //   className="w-full border rounded-lg border-border bg-transparent hover:bg-accent/30 transition-all duration-200 group">
+              //   {/* ردیف اصلی که همیشه نمایش داده می‌شود */}
+              //   <div className="flex items-center p-3 gap-3 select-none ">
+              //     <Checkbox id={todo.id}
+              //       onClick={e => {
+              //         toggleTask(todo.id);
+              //       }}
+              //       checked={todo.completed}
+              //       className="shrink-0"
+              //     />
 
-                  <div className="grow min-w-0">
-                    <span
-                      className={`text-base font-medium truncate block ${
-                        todo.completed ? 'line-through text-muted-foreground' : 'text-foreground'
-                      }`}>
-                      {todo.title}
-                    </span>
-                  </div>
+              //     <div className="grow min-w-0">
+              //       <label htmlFor={todo.id}
+              //         className={`text-base tracking-tight truncate block select-none ${
+              //           todo.completed ? 'line-through text-muted-foreground' : 'text-foreground'
+              //         }`}>
+              //         {todo.title}
+              //       </label>
+              //     </div>
 
-                  {/* بخش دکمه‌های عملیاتی */}
-                  <div className="flex items-center space-x-1 md:space-x-2  shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className=" text-muted-foreground hover:text-secondary hover:bg-secondary/10 dark:hover:bg-secondary/10 h-8 w-8"
-                      aria-label="Edit Task">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <DeleteTaskDialog onConfirm={() => deleteTask(todo.id)}>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/10 h-8 w-8 "
-                        aria-label="Delete Task">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </DeleteTaskDialog>
+              //     {/* بخش دکمه‌های عملیاتی */}
+              //     <div className="flex items-center space-x-1 md:space-x-2  shrink-0">
+              //       <Button
+              //         variant="ghost"
+              //         size="icon"
+              //         className=" text-muted-foreground hover:text-secondary hover:bg-secondary/10 dark:hover:bg-secondary/10 h-8 w-8"
+              //         aria-label="Edit Task">
+              //         <Pencil className="h-4 w-4" />
+              //       </Button>
+              //       <DeleteTaskDialog onConfirm={() => deleteTask(todo.id)}>
+              //         <Button
+              //           variant="ghost"
+              //           size="icon"
+              //           className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/10 h-8 w-8 "
+              //           aria-label="Delete Task">
+              //           <Trash2 className="h-4 w-4" />
+              //         </Button>
+              //       </DeleteTaskDialog>
 
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                </div>
+              //       <CollapsibleTrigger asChild>
+              //         <Button variant="ghost" size="icon" className="h-8 w-8">
+              //           <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+              //         </Button>
+              //       </CollapsibleTrigger>
+              //     </div>
+              //   </div>
 
-                {/* محتوای مخفی که با زدن فلش باز می‌شود */}
-                <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                  <div className="px-3 pb-4 pt-1 flex flex-wrap items-center gap-3 border-t border-border/40 mx-3 mt-1">
-                    <Badge variant="outline" className="px-2 py-0.5 text-muted-foreground">
-                      {todo.category}
-                    </Badge>
-
-                    <Badge priority={todo.priority}>
-                      {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
-                    </Badge>
-
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {formatDate(todo.createdAt)}
-                    </div>
-
-                    {todo.dueDate && (
-                      <div className="flex items-center text-xs text-primary font-semibold">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Due: {formatDate(new Date(todo.dueDate).getTime())}
-                      </div>
-                    )}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
+              //   <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+              //     <div className="px-3 pb-4 pt-2 flex flex-wrap items-center gap-3 border-t border-border/40 mx-3 mt-1">
+              //       <Badge variant="outline" className="px-2 py-0.5 text-muted-foreground">
+              //         {todo.category}
+              //       </Badge>
+              //       <Badge priority={todo.priority}>
+              //         {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+              //       </Badge>
+              //       <div className="flex items-center text-xs text-muted-foreground">
+              //         <Clock className="h-3 w-3 mr-1" />
+              //         {formatDate(todo.createdAt)}
+              //       </div>
+              //       {todo.dueDate && (
+              //         <div className="flex items-center text-xs text-primary font-semibold">
+              //           <Calendar className="h-3 w-3 mr-1" />
+              //           Due: {formatDate(new Date(todo.dueDate).getTime())}
+              //         </div>
+              //       )}{' '}
+              //       {todo.description && (
+              //         <p className="mt-2 sm:mt-0 sm:ml-auto text-sm text-muted-foreground wrap-break-words">
+              //           {todo.description}
+              //         </p>
+              //       )}
+              //     </div>
+              //   </CollapsibleContent>
+              // </Collapsible>
             ))}
           </div>{' '}
           {/* 4. Footer Actions (Clear Completed) */}

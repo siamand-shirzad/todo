@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Plus, Clock, List, Calendar, ChevronDown, Check } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, List, ChevronDown, Check } from 'lucide-react';
+import { format } from 'date-fns';
 
-// فرض بر این است که این کامپوننت‌ها از shadcn/ui وارد شده‌اند:
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -16,34 +17,35 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Calendar } from '@/components/ui/calendar';
 import useTodoStore from '@/store/useTodoStore';
 
 const priorities = [
-  { value: 'low', label: 'Low', icon: Clock, color: 'text-green-500' },
-  { value: 'medium', label: 'Medium', icon: Clock, color: 'text-yellow-500' },
-  { value: 'high', label: 'High', icon: Clock, color: 'text-red-500' }
+  { value: 'low', label: 'Low', color: 'bg-green-500' },
+  { value: 'medium', label: 'Medium', color: 'bg-yellow-500' },
+  { value: 'high', label: 'High', color: 'bg-red-500' }
 ];
-
 const categories = [
-  { value: 'work', label: 'Work' },
-  { value: 'personal', label: 'Personal' },
-  { value: 'learning', label: 'Learning' },
-  { value: 'other', label: 'Other' }
+  { value: 'work', label: 'Work', color: 'bg-blue-500' },
+  { value: 'personal', label: 'Personal', color: 'bg-purple-500' },
+  { value: 'learning', label: 'Learning', color: 'bg-indigo-500' },
+  { value: 'other', label: 'Other', color: 'bg-gray-500' }
 ];
 
 export function CreateTaskDialog() {
-  const addTask = useTodoStore((state) => state.addTask);
+  const addTask = useTodoStore(state => state.addTask);
   const [open, setOpen] = React.useState(false);
 
+  // فرم استیت‌ها (Form States)
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [priority, setPriority] = React.useState(priorities[0]); // Low as default
-  const [category, setCategory] = React.useState(categories[0]); // Work as default
-  const [dueDate, setDueDate] = React.useState(null); // Calendar state needed here
+  const [priority, setPriority] = React.useState(priorities[0]);
+  const [category, setCategory] = React.useState(categories[0]);
+  const [dueDate, setDueDate] = React.useState(null);
 
-  const handleSave = () => {
-    if (!title.trim()) return; // Title is required
+  const handleSave = e => {
+    e.preventDefault();
+    if (!title.trim()) return;
 
     const newTask = {
       id: Date.now(),
@@ -55,126 +57,158 @@ export function CreateTaskDialog() {
       completed: false,
       createdAt: Date.now()
     };
-    console.log(newTask);
-    addTask(newTask)
 
+    addTask(newTask);
+
+    // ریست کردن فرم بعد از ذخیره
     setTitle('');
     setDescription('');
+    setPriority(priorities[0]);
+    setCategory(categories[0]);
     setDueDate(null);
-    setOpen(false); 
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size='' className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-4 w-4 " />
+        <Button className="gap-2 shadow-sm font-semibold">
+          <Plus className="h-4 w-4" />
           New Task
         </Button>
       </DialogTrigger>
 
-       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center text-xl text-primary">
-            <List className="h-5 w-5 mr-2" />
+      <DialogContent
+        className="sm:max-w-[500px] p-0 overflow-hidden  data-[state=open]:animate-scale-fade-in data-[state=closed]:animate-scale-fade-out ">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle className="flex items-center text-xl gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <List className="h-5 w-5 text-primary" />
+            </div>
             Create New Task
           </DialogTitle>
-          <DialogDescription>Enter the details for your new task. Click save when you're done.</DialogDescription>
+          <DialogDescription>Organize your day by adding a new task details below.</DialogDescription>
         </DialogHeader>
+        <form onSubmit={handleSave}>
+          <div className="p-6 grid gap-5">
+            <div className="grid gap-2">
+              <Label htmlFor="title" className="text-sm font-semibold">
+                Title <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="title"
+                placeholder="What needs to be done?"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                className="h-10 shadow-sm"
+                autoFocus
+              />
+            </div>
 
-        <div className="grid gap-4 py-4">
-          {/* Title Field */}
-          <div className="grid gap-2">
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              placeholder="e.g., Finish React portfolio project"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              className="col-span-3"
-            />
-          </div>
-
-          {/* Description Field */}
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              placeholder="Add details about the task..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              className="col-span-3 min-h-20"
-            />
-          </div>
-
-          {/* Priority, Category, and Due Date Row */}
-          <div className="grid grid-cols-3 gap-4">
-            {/* Priority Selection (Combobox/Popover) */}
-            <div className="grid gap-2 col-span-1">
-              <Label>Priority</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" role="combobox" className="justify-between h-9">
-                    <div className="flex items-center">
-                      <priority.icon className={`mr-2 h-4 w-4 ${priority.color}`} />
-                      {priority.label}
-                    </div>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[180px] p-2">
-                  <div className="flex flex-col">
+            {/* ردیف تنظیمات سه تایی */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Priority */}
+              <div className="grid gap-1.5">
+                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Priority</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="justify-between h-9 px-3 font-normal">
+                      <div className="flex items-center gap-2">
+                        <div className={cn('h-2 w-2 rounded-full', priority.color)} />
+                        {priority.label}
+                      </div>
+                      <ChevronDown className="h-3 w-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[140px] p-1 " align="start">
                     {priorities.map(p => (
                       <button
                         key={p.value}
                         onClick={() => setPriority(p)}
-                        className="flex flex-row items-center justify-center    px-2 py-1.5 rounded hover:bg-accent text-sm">
-                        <p.icon className={`order-2 h-4 w-4 ${p.color}`} />
+                        className="flex items-center w-full gap-2 px-2 py-1.5 rounded-sm text-sm hover:bg-accent transition-colors">
+                        <div className={cn('h-2 w-2 rounded-full', p.color)} />
                         {p.label}
-
-                        {priority.value === p.value && <Check className="mr-auto order-1 h-4 w-4" />}
+                        {priority.value === p.value && <Check className="ml-auto h-3 w-3" />}
                       </button>
                     ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Category */}
+              <div className="grid gap-1.5">
+                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Category</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="justify-between h-9 px-3 font-normal">
+                      <div className="flex items-center gap-2">
+                        <div className={cn('h-2 w-2 rounded-full', category.color)} />
+                        {category.label}
+                      </div>
+                      <ChevronDown className="h-3 w-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[140px] p-1" align="start">
+                    {categories.map(c => (
+                      <button
+                        key={c.value}
+                        onClick={() => setCategory(c)}
+                        className="flex items-center w-full gap-2 px-2 py-1.5 rounded-sm text-sm hover:bg-accent transition-colors">
+                        <div className={cn('h-2 w-2 rounded-full', c.color)} />
+                        {c.label}
+                        {category.value === c.value && <Check className="ml-auto h-3 w-3" />}
+                      </button>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Date Picker */}
+              <div className="grid gap-1.5">
+                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Due Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'justify-start text-left h-9 px-3 font-normal',
+                        !dueDate && 'text-muted-foreground'
+                      )}>
+                      <CalendarIcon className="mr-2 h-3 w-3" />
+                      {dueDate ? format(dueDate, 'MMM d') : <span>Pick date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
 
-            {/* Category Selection (Combobox/Popover) */}
-            <div className="grid gap-2 col-span-1">
-              <Label>Category</Label>
-              <Button variant="outline" className="justify-between h-9 text-muted-foreground">
-                {category.label}
-              </Button>
-            </div>
-
-            {/* Due Date (Calendar/Popover) - نیاز به کامپوننت Calendar از shadcn */}
-            <div className="grid gap-2 col-span-1">
-              <Label>Due Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant={'outline'} className="justify-start text-left font-normal h-9">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {dueDate ? format(dueDate, 'PPP') : 'Pick a date'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  {/* <CalendarComponent mode="single" selected={dueDate} onSelect={setDueDate} /> */}
-                  <div className="p-2 text-center text-sm text-muted-foreground">Calendar component needed</div>
-                </PopoverContent>
-              </Popover>
+            {/* Description */}
+            <div className="grid gap-2">
+              <Label htmlFor="description" className="text-sm font-semibold">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                placeholder="Write some notes..."
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                className="min-h-20 resize-none shadow-sm"
+              />
             </div>
           </div>
-        </div>
 
-        <DialogFooter>
-          <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>{' '}
-          <Button type="submit" onClick={handleSave} disabled={!title.trim()}>
-            Save Task
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="p-6 pt-0 ">
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!title.trim()} className="px-6">
+              Create Task
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

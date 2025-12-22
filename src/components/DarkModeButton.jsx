@@ -8,6 +8,7 @@ const DarkmodeButton = ({ className }) => {
   return (
     <button
       onClick={toggleMode}
+      title='darkmode'
       className={`
         inline-flex items-center justify-center gap-2 whitespace-nowrap 
         rounded-lg text-sm font-medium transition-all 

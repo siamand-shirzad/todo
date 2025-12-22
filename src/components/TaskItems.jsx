@@ -40,11 +40,11 @@ export function TaskItem({ todo, toggleTask, deleteTask, onEdit }) {
           className={cn(
             'w-1 h-8 rounded-full shrink-0 bg-linear-to-b transition-all duration-300 opacity-60 group-hover:opacity-100',
             priorityStyles[todo.priority],
-            todo.completed && 'opacity-30'
+            todo.completed && 'opacity-10'
           )}
         />
         <Checkbox checked={todo.completed} onCheckedChange={() => toggleTask(todo.id)} className="h-4 w-4" />
-        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+        <div className=" flex-1  cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
           <span
             className={cn(
               'text-[16px] font-medium transition-colors',

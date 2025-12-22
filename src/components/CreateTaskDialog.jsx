@@ -48,7 +48,6 @@ export function CreateTaskDialog() {
   const [dueDate, setDueDate] = React.useState(null);
   React.useEffect(() => {
     if (editingTask) {
-      // --- حالت ویرایش (Edit Mode) ---
       setTitle(editingTask.title);
       setDescription(editingTask.description || '');
       setPriority(priorities.find(p => p.value === editingTask.priority) || priorities[0]);
@@ -77,9 +76,8 @@ export function CreateTaskDialog() {
       createdAt: Date.now()
     };
     if (editingTask) {
-      updateTask(editingTask.id,newTask);
+      updateTask(editingTask.id, newTask);
     } else {
-      
       addTask(newTask);
     }
     setTitle('');
@@ -96,7 +94,7 @@ export function CreateTaskDialog() {
       onOpenChange={open => {
         if (!open) {
           closeModal();
-        }else{
+        } else {
           openModal();
         }
       }}>
@@ -207,7 +205,18 @@ export function CreateTaskDialog() {
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="end">
                     <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
-                  </PopoverContent>
+                    {dueDate && (
+                      <div className="p-2 border-t border-border">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full text-[11px] h-7"
+                          onClick={() => setDueDate(null)}>
+                          Clear Date
+                        </Button>
+                      </div>
+                    )}
+                  </PopoverContent>{' '}
                 </Popover>
               </div>
             </div>

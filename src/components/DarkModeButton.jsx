@@ -1,7 +1,7 @@
 import { useThemeStore } from '@/store/useThemeStore';
 import { FiMoon, FiSun } from 'react-icons/fi';
 
-const DarkmodeButton = ({ className }) => {
+const DarkModeButton = ({ className }) => {
   const toggleMode = useThemeStore(state => state.toggleMode);
   const isDarkMode = useThemeStore(state => state.isDarkMode);
 
@@ -29,4 +29,4 @@ const DarkmodeButton = ({ className }) => {
   );
 };
 
-export default DarkmodeButton;
+export default DarkModeButton;

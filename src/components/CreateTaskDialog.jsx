@@ -34,15 +34,34 @@ const categories = [
 
 export function CreateTaskDialog() {
   const addTask = useTodoStore(state => state.addTask);
-  const [open, setOpen] = React.useState(false);
+  const updateTask = useTodoStore(state => state.updateTask);
+  const openModal = useTodoStore(state => state.openModal);
+  const closeModal = useTodoStore(state => state.closeModal);
+  const isModalOpen = useTodoStore(state => state.isModalOpen);
+  const editingTask = useTodoStore(state => state.editingTask);
+  // const [open, setOpen] = React.useState(false);
 
-  // فرم استیت‌ها (Form States)
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [priority, setPriority] = React.useState(priorities[0]);
   const [category, setCategory] = React.useState(categories[0]);
   const [dueDate, setDueDate] = React.useState(null);
-
+  React.useEffect(() => {
+    if (editingTask) {
+      // --- حالت ویرایش (Edit Mode) ---
+      setTitle(editingTask.title);
+      setDescription(editingTask.description || '');
+      setPriority(priorities.find(p => p.value === editingTask.priority) || priorities[0]);
+      setCategory(categories.find(c => c.value === editingTask.category) || categories[0]);
+      setDueDate(editingTask.dueDate ? new Date(editingTask.dueDate) : null);
+    } else {
+      setTitle('');
+      setDescription('');
+      setPriority(priorities[0]);
+      setCategory(categories[0]);
+      setDueDate(null);
+    }
+  }, [editingTask]); // هر بار که editingTask تغییر کند، این منطق اجرا می‌شود
   const handleSave = e => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -57,35 +76,43 @@ export function CreateTaskDialog() {
       completed: false,
       createdAt: Date.now()
     };
-
-    addTask(newTask);
-
-    // ریست کردن فرم بعد از ذخیره
+    if (editingTask) {
+      updateTask(editingTask.id,newTask);
+    } else {
+      
+      addTask(newTask);
+    }
     setTitle('');
     setDescription('');
     setPriority(priorities[0]);
     setCategory(categories[0]);
     setDueDate(null);
-    setOpen(false);
+    closeModal();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={isModalOpen}
+      onOpenChange={open => {
+        if (!open) {
+          closeModal();
+        }else{
+          openModal();
+        }
+      }}>
       <DialogTrigger asChild>
         <Button className="gap-2 shadow-sm font-semibold">
           <Plus className="h-4 w-4" />
           New Task
         </Button>
       </DialogTrigger>
-
-      <DialogContent
-        className="sm:max-w-[500px] p-0 overflow-hidden  data-[state=open]:animate-scale-fade-in data-[state=closed]:animate-scale-fade-out ">
+      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden  data-[state=open]:animate-scale-fade-in data-[state=closed]:animate-scale-fade-out ">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center text-xl gap-3">
             <div className="p-2 bg-primary/10 rounded-lg">
               <List className="h-5 w-5 text-primary" />
             </div>
-            Create New Task
+            {editingTask ? 'Edit Task' : 'Create New Task'}{' '}
           </DialogTitle>
           <DialogDescription>Organize your day by adding a new task details below.</DialogDescription>
         </DialogHeader>
@@ -201,11 +228,16 @@ export function CreateTaskDialog() {
           </div>
 
           <DialogFooter className="p-6 pt-0 ">
-            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                closeModal();
+              }}>
               Cancel
             </Button>
             <Button type="submit" disabled={!title.trim()} className="px-6">
-              Create Task
+              {editingTask ? 'Save Changes' : 'Create Task'}{' '}
             </Button>
           </DialogFooter>
         </form>

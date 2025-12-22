@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import DeleteTaskDialog from './DeleteTaskDialog';
+import useTodoStore from '@/store/useTodoStore';
 
 const priorityStyles = {
   high: 'from-red-500 to-red-600 shadow-[0_0_8px_rgba(239,68,68,0.25)]',
@@ -23,6 +24,7 @@ const priorityDots = {
 
 export function TaskItem({ todo, toggleTask, deleteTask, onEdit }) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const openEditModal = useTodoStore(state => state.openEditModal);
 
   return (
     <Collapsible
@@ -62,7 +64,6 @@ export function TaskItem({ todo, toggleTask, deleteTask, onEdit }) {
 
       {/* --- Content Section --- */}
       <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-      
         <div className="px-6 pb-5 pt-0 space-y-5">
           {/* Description */}
           {todo.description && (
@@ -101,7 +102,7 @@ export function TaskItem({ todo, toggleTask, deleteTask, onEdit }) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onEdit?.(todo)}
+              onClick={() => openEditModal(todo)}
               className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-foreground">
               <Pencil className="h-3.5 w-3.5" /> Edit
             </Button>

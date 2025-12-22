@@ -24,9 +24,7 @@ export const useThemeStore = create(
     name: 'theme-storage',
     partialize: (state) => ({ isDarkMode: state.isDarkMode }),
 
-    onRehydrateStorage: () => (state) => {
-      console.log(state);
-      
+    onRehydrateStorage: () => (state) => {      
         if (state) {
           applyTheme(state.isDarkMode);
         }

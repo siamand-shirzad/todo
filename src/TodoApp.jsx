@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; 
 import { Badge } from '@/components/ui/badge';
 import { Search, X, Zap, CalendarDays, Filter, XCircle, XCircleIcon } from 'lucide-react';
-import DarkmodeButton from './components/DarkmodeButton';
+import DarkModeButton from './components/DarkmodeButton';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
 import useTodoStore from './store/useTodoStore';
 import DeleteTaskDialog from './components/DeleteTaskDialog';
@@ -72,7 +72,7 @@ export default function ProTodoApp() {
               <Zap className="h-7 w-7 mr-2 text-yellow-500 fill-yellow-500" />
               Task Manager
             </CardTitle>
-            <DarkmodeButton />
+            <DarkModeButton />
           </div>
           
           <CardDescription className="flex items-center gap-2 mt-2">

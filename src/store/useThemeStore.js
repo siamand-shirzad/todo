@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-const applyTheme = (isDark) => {
+const applyTheme = isDark => {
   if (isDark) {
     document.documentElement.classList.add('dark');
   } else {
@@ -8,14 +9,27 @@ const applyTheme = (isDark) => {
   }
 };
 
-export const useThemeStore = create((set, get) => ({
-  isDarkMode: false, // حالت اولیه light
+export const useThemeStore = create(
+  persist((set, get) => ({
+    isDarkMode: false,
 
-  toggleMode: () => {
-    set((state) => {
-      const newMode = !state.isDarkMode;
-      applyTheme(newMode);
-      return { isDarkMode: newMode };
-    });
-  },
-}));
+    toggleMode: () => {
+      set(state => {
+        const newMode = !state.isDarkMode;
+        applyTheme(newMode);
+        return { isDarkMode: newMode };
+      });
+    }
+  }),{
+    name: 'theme-storage',
+    partialize: (state) => ({ isDarkMode: state.isDarkMode }),
+
+    onRehydrateStorage: () => (state) => {
+      console.log(state);
+      
+        if (state) {
+          applyTheme(state.isDarkMode);
+        }
+      },
+  }
+));

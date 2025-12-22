@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; 
 import { Badge } from '@/components/ui/badge';
 import { Search, X, Zap, CalendarDays, Filter, XCircle, XCircleIcon } from 'lucide-react';
-import DarkModeButton from './components/DarkmodeButton';
+import DarkModeButton from './components/DarkModeButton';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
 import useTodoStore from './store/useTodoStore';
 import DeleteTaskDialog from './components/DeleteTaskDialog';

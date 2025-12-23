@@ -60,7 +60,7 @@ export function CreateTaskDialog() {
       setCategory(categories[0]);
       setDueDate(null);
     }
-  }, [editingTask]); // هر بار که editingTask تغییر کند، این منطق اجرا می‌شود
+  }, [editingTask]); 
   const handleSave = e => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -130,7 +130,6 @@ export function CreateTaskDialog() {
               />
             </div>
 
-            {/* ردیف تنظیمات سه تایی */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Priority */}
               <div className="grid gap-1.5">
@@ -203,14 +202,13 @@ export function CreateTaskDialog() {
                       {dueDate ? format(dueDate, 'MMM d') : <span>Pick date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
+                  <PopoverContent  className="w-auto p-0 " align="end" avoidCollisions={true} collisionPadding={20}>
+                    <Calendar mode="single" selected={dueDate} onSelect={setDueDate}  showOutsideDays={false} initialFocus />
                     {dueDate && (
-                      <div className="p-2 border-t border-border">
+                      <div className="p-1 border-t border-border">
                         <Button
                           variant="ghost"
-                          size="sm"
-                          className="w-full text-[11px] h-7"
+                          className="w-full text-[10px] h-6"
                           onClick={() => setDueDate(null)}>
                           Clear Date
                         </Button>

@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import useTodoStore from '@/store/useTodoStore';
+import TaskSelector from './TaskSelector';
 
 const priorities = [
   { value: 'low', label: 'Low', color: 'bg-green-500' },
@@ -132,60 +133,9 @@ export function CreateTaskDialog() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Priority */}
-              <div className="grid gap-1.5">
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Priority</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-between h-9 px-3 font-normal">
-                      <div className="flex items-center gap-2">
-                        <div className={cn('h-2 w-2 rounded-full', priority.color)} />
-                        {priority.label}
-                      </div>
-                      <ChevronDown className="h-3 w-3 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[140px] p-1 " align="start">
-                    {priorities.map(p => (
-                      <button
-                        key={p.value}
-                        onClick={() => setPriority(p)}
-                        className="flex items-center w-full gap-2 px-2 py-1.5 rounded-sm text-sm hover:bg-accent transition-colors">
-                        <div className={cn('h-2 w-2 rounded-full', p.color)} />
-                        {p.label}
-                        {priority.value === p.value && <Check className="ml-auto h-3 w-3" />}
-                      </button>
-                    ))}
-                  </PopoverContent>
-                </Popover>
-              </div>
-
+              <TaskSelector label={'Priority'} value={priority} options={priorities} onChange={setPriority} />
               {/* Category */}
-              <div className="grid gap-1.5">
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Category</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-between h-9 px-3 font-normal">
-                      <div className="flex items-center gap-2">
-                        <div className={cn('h-2 w-2 rounded-full', category.color)} />
-                        {category.label}
-                      </div>
-                      <ChevronDown className="h-3 w-3 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[140px] p-1" align="start">
-                    {categories.map(c => (
-                      <button
-                        key={c.value}
-                        onClick={() => setCategory(c)}
-                        className="flex items-center w-full gap-2 px-2 py-1.5 rounded-sm text-sm hover:bg-accent transition-colors">
-                        <div className={cn('h-2 w-2 rounded-full', c.color)} />
-                        {c.label}
-                        {category.value === c.value && <Check className="ml-auto h-3 w-3" />}
-                      </button>
-                    ))}
-                  </PopoverContent>
-                </Popover>
-              </div>
+              <TaskSelector label={'Category'} value={category} options={categories} onChange={setCategory} />
 
               {/* Date Picker */}
               <div className="grid gap-1.5">

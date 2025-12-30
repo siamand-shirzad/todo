@@ -10,7 +10,7 @@ import DarkModeButton from './components/DarkModeButton';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
 import useTodoStore from './store/useTodoStore';
 import DeleteTaskDialog from './components/DeleteTaskDialog';
-import { TaskItem } from './components/TaskItems';
+import { TaskItem } from './components/tasks/TaskItem';
 
 const PRIORITIES = {
   ALL: 'all',

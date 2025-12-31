@@ -17,14 +17,15 @@ export function SwipeableRow({ children, onSwipeLeft, onSwipeRight }) {
     const threshold = 100;
 
     if (offset > threshold) {
-      onSwipeRight();
       await controls.start({ x: 0 });
+      onSwipeRight();
     } else if (offset < -threshold) {
       await controls.start({ x: -500, transition: { duration: 0.2 } });
       onSwipeLeft();
-    } else {
       await controls.start({ x: 0 });
-    }
+    }else{
+      await controls.start({ x: 0 });
+    } 
   };
 
   return (

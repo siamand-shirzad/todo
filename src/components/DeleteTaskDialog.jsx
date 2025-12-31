@@ -13,18 +13,17 @@ import { Button } from './ui/button';
 import { OctagonAlert, Trash, Trash2, X } from 'lucide-react';
 import useTodoStore from '@/store/useTodoStore';
 const DeleteTaskDialog = ({
+  open,
+  onOpenChange,
   title = 'Are you absolutely sure?',
   description = 'This action cannot be undone.This task will be permanently deleted.',
   onConfirm,
   children
 }) => {
-
   return (
     <>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          {children}
-        </AlertDialogTrigger>
+      <AlertDialog open={open} onOpenChange={onOpenChange}>
+        {children && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>}
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
